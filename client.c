@@ -12,6 +12,7 @@
 
 #include <unistd.h>     // from man close
 
+#include <string.h>
 
 int main(){
 
@@ -46,7 +47,18 @@ int main(){
         printf("error connecting the socket! \n");
     }
 
+    char buffer[256] = {0};
+
     while(1){
+
+        fgets( buffer, sizeof(buffer), stdin );
+        //sprintf( buffer, "Hello World! \n" );
+        printf("[%s]", buffer);
+
+        int send_to_r = sendto( socket_fd, buffer, strlen(buffer) -1 , 0, NULL, 0);
+        if(send_to_r == -1){
+            printf("error! \n");
+        }
 
     }
 

@@ -12,6 +12,7 @@
 
 #include <pthread.h>        // from man pthreads
 
+#include <errno.h>
 
 int main(){
 
@@ -75,9 +76,29 @@ int main(){
             printf("error accepting! \n");
         }
 
-        // running = 0;
+        
 
+        // nbcar=recvfrom(sd, buff,MAXOCTETS+1,0,NULL,NULL);
+        
+        int number;
+        
+        while(1){
 
+            char buffer[256] = {0};
+            number = recv( accept_fd, buffer, sizeof(buffer)+1, 0 ) ;
+            
+            if(number == -1 | number == '\0' )
+                break;
+
+            printf("[%s] [%d]\n", buffer, number);
+
+        }
+
+        //int number = recv( accept_fd, buffer, 255, 0 ) ;
+
+        printf("Here now \n");
+
+        running = 0;
 
     }
 
