@@ -1,4 +1,6 @@
-all : server client
+all : 
+	gcc server.c -o server
+	gcc client.c -o client
 
 server : 
 	gcc server.c -o server
@@ -6,4 +8,3 @@ server :
 client :
 	gcc client.c -o client
 
-	

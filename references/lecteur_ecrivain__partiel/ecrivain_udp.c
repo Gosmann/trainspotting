@@ -14,8 +14,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
- #include <unistd.h>
-
+#include <unistd.h>
 
 
 #define CHECK_ERROR(val1,val2,msg)   if (val1==val2) \
