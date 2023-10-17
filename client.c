@@ -10,7 +10,12 @@
 // from man htons
 #include <arpa/inet.h>
 
+#include <unistd.h>     // from man close
+
+
 int main(){
+
+    //signal(SIGINT, handle_sigint);    // TODO this later
 
     printf("Hello World! from client \n");
 
@@ -45,6 +50,7 @@ int main(){
 
     }
 
+    close(socket_fd);
 
     return 0;
 }

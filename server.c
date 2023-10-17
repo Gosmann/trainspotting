@@ -7,8 +7,11 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-// from man htons
-#include <arpa/inet.h>
+#include <arpa/inet.h>      // from man htons
+#include <unistd.h>     // from man close
+
+#include <pthread.h>        // from man pthreads
+
 
 int main(){
 
@@ -29,7 +32,8 @@ int main(){
     struct sockaddr_in my_addr;
     my_addr.sin_family = AF_INET ;
     my_addr.sin_port = htons(1994);
-    my_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    //my_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    my_addr.sin_addr.s_addr = INADDR_ANY;
     
     // int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
     int bind_r = bind( socket_fd, (struct sockaddr *)&my_addr, sizeof(my_addr)) ;
@@ -43,7 +47,7 @@ int main(){
     
     // listen
     //int listen(int sockfd, int backlog);
-    int listen_r = listen( socket_fd, 0 );     // backlog int defines max queue
+    int listen_r = listen( socket_fd, 10 );     // backlog int defines max queue
     
     if( listen_r == 0 ){
         printf("successfully listen! [%d] \n", listen_r);
@@ -52,22 +56,32 @@ int main(){
         printf("error listening! \n");
     }
 
-    // accept
-    socklen_t addr_size_peer = sizeof( struct sockaddr_in );
-    int accept_fd = accept( socket_fd, (struct sockaddr *)&my_addr, &addr_size_peer ) ;
+    // now it will always be listening
     
-    if( 1 ){
-        printf("successfully accepted! [%d] \n", accept_fd);
-    }
-    else{
-        printf("error accepting! \n");
-    }
-    
-    while(1){
+    int running = 1;
+
+    while( running ){
+        // starts accepting connections
+        struct sockaddr_in peer_addr;
+        socklen_t addr_size_peer = sizeof( struct sockaddr_in );
+        int accept_fd = accept( socket_fd, (struct sockaddr *)&peer_addr, &addr_size_peer ) ;
+        
+        if( accept_fd >= 0 ){
+            printf("successfully accepted! [%d] [%s] [%d]\n", 
+                accept_fd, inet_ntoa( peer_addr.sin_addr ), htons(peer_addr.sin_port) );
+        
+        }
+        else{
+            printf("error accepting! \n");
+        }
+
+        // running = 0;
 
 
+
     }
 
+    close(socket_fd);
 
     return 0;
 }
