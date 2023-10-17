@@ -1,0 +1,26 @@
+{
+    "files.associations": {
+        "array": "c",
+        "chrono": "c",
+        "compare": "c",
+        "functional": "c",
+        "ratio": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "__functional_base": "c",
+        "__functional_base_03": "c",
+        "__hash_table": "c",
+        "__tree": "c",
+        "__tuple": "c",
+        "algorithm": "c",
+        "forward_list": "c",
+        "limits": "c",
+        "memory": "c",
+        "random": "c",
+        "__locale": "c",
+        "train.h": "c",
+        "bitset": "c",
+        "set": "c"
+    }
+}
