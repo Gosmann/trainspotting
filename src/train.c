@@ -50,11 +50,11 @@ int main( int argc, char ** argv ){
         }
         */
         //else if(argc == 3){
-        if(argc == 3){
-            strcpy( train.type_id, argv[1] );
-            strcpy( train.id, argv[2] );
-            state = base_case ;
-        }
+        
+        strcpy( train.type_id, argv[2] );
+        strcpy( train.id, argv[3] );
+        state = base_case ;
+    
 
     }
 
@@ -127,7 +127,7 @@ int main( int argc, char ** argv ){
 
         }
         else{
-            printf("unknown command, try again...");            
+            printf("unknown command, try again...\n");            
         }
 
         //printf("[%s]", buffer);
