@@ -17,6 +17,34 @@
 
 #include "../include/server.h"
 
+int calculate_eoa( train_set_t * train ){
+    /*
+    train_set_t * target = train;
+
+    while( target->prev != NULL ){
+        
+        if( train->train.eoa < target->prev->train.location ){
+            printf("define eoa by location");
+            train->train.eoa = target->prev->train.location ; 
+            return 0;
+        }
+        
+        target = target->prev ;
+    }
+
+    train->train.eoa = 100 ;    // TODO make a define for this        
+    */
+
+    if( train->prev != NULL ){
+        train->train.eoa = (train->prev)->train.location ;
+    }
+    else{
+        train->train.eoa = 101 ;
+    }    
+
+    return 0;
+}
+
 void * treat_client( train_set_t * train ){
 
     struct sockaddr_in peer_addr;        // this will hold info about the client
@@ -38,13 +66,14 @@ void * treat_client( train_set_t * train ){
 
     // print current train params
     //print_train_params( &(train->train) );
-
-    while(1){
+    int running = 1;
+    
+    while( running == 1 ){
         //print_train_params( &(train->train) );
         print_all_trains( train );
 
         char buffer[256] = {0};
-        message_t message;
+        message_t message = {0};
         int number = recv( train->train.socket_fd , &message, sizeof(message), 0 ) ;
         
         if(number == -1 | number == 0 )
@@ -54,12 +83,20 @@ void * treat_client( train_set_t * train ){
         if( message.message[0] == 'u' ){    // update position
             train->train.location = message.train.location;
 
-            train->train.eoa = 66 ;
-            message_t message_new = { {"EOA"}, train->train };
-            int send_r = sendto(  train->train.socket_fd, &message_new, 
-                sizeof(message_new), 0, NULL, 0);
+            calculate_eoa( train );
+
+            //print_all_trains( train );
+            //train->train.eoa = 66 ;
+
+            message_t message = { {"EOA"}, train->train };
+            int send_r = sendto(  train->train.socket_fd, &message, 
+                sizeof(message), 0, NULL, 0);
             
             assert(send_r != -1);
+        }
+
+        else if( message.message[0] == 'e' ){
+            running = 0;
         }
 
         
@@ -67,14 +104,16 @@ void * treat_client( train_set_t * train ){
         //printf("[%s] [%d]\n", buffer, number);
     }
 
+    close( train->train.socket_fd );
+
     remove_train( &train );
 
     printf("❌ \t end of connection from [ip:%s] and [port:%6d] at [PID:%d]\n\n",
         inet_ntoa( peer_addr.sin_addr ), htons(peer_addr.sin_port), gettid() );
 
-    print_all_trains( train );
+    print_all_trains( train->next );
 
-    close( train->train.socket_fd );
+    
 }
 
 // inits the server to specified port

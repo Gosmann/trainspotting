@@ -94,18 +94,22 @@ train_set_t * add_train(train_set_t * set, int type_id, char * train_id) {
 train_set_t * remove_train(train_set_t ** set){
 
     train_set_t * old = set[0] ; 
+    train_set_t * ret ; 
     
-    if( set[0]->prev != NULL )
+    if( set[0]->prev != NULL ){
         set[0]->prev->next = set[0]->next ;
+        
+    }
     
-    if( set[0]->next != NULL )
+    if( set[0]->next != NULL ){
         set[0]->next->prev = set[0]->prev;
+    }
     
-    set[0] = (set[0]->next);
+    ret = set[0]->next;
+    //set[0] = set[0]->next;    
+    //free( old ) ;
     
-    free( old ) ;
-
-    return set[0];  // returns the new first element
+    return ret;  // returns the new first element
 }
 
 // Functions type_train
