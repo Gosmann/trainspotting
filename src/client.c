@@ -33,15 +33,18 @@ int main(){
 
     // connect (defining the address)
     
-    struct sockaddr_in my_addr;
-    my_addr.sin_family = AF_INET ;
-    my_addr.sin_port = htons(1994);
-    my_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    struct sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET ;
+    server_addr.sin_port = htons(1994);
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     
-    int connect_r = connect( socket_fd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr) ) ;
+    int connect_r = connect( socket_fd, (struct sockaddr *)&server_addr, 
+        sizeof(struct sockaddr) ) ;
     
     if( connect_r != -1 ){
-        printf("successfully connected the socket! [%d] \n", connect_r);
+        printf("successfully connected the socket! [%d] [%s] [%d] \n", 
+            socket_fd, inet_ntoa( server_addr.sin_addr ), htons(server_addr.sin_port) );
+
     }
     else {
         printf("error connecting the socket! \n");
@@ -55,11 +58,17 @@ int main(){
         //sprintf( buffer, "Hello World! \n" );
         printf("[%s]", buffer);
 
-        int send_to_r = sendto( socket_fd, buffer, strlen(buffer) -1 , 0, NULL, 0);
-        if(send_to_r == -1){
-            printf("error! \n");
-        }
+        // send only if there is something to send
+        if( strlen( buffer ) > 0 ){
 
+            int send_to_r = sendto( socket_fd, buffer, strlen(buffer) -1 , 0, NULL, 0);
+
+            if(send_to_r == -1){
+                printf("error! \n");
+            }
+
+        }
+        
     }
 
     close(socket_fd);

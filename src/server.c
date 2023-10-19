@@ -1,5 +1,7 @@
 // TODO create a nice header
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,13 +16,41 @@
 
 #include <errno.h>
 
-void * treat_client( struct sockaddr_in * peer_addr ){
+#include <assert.h>
 
-    printf("Hello World from another thread \n");
+
+
+
+void * treat_client( int * socket_fd ){
+
+    struct sockaddr_in peer_addr;        // this will hold info about the client
+    socklen_t addr_size = sizeof(struct sockaddr_in);
+    int res = getpeername( socket_fd[0] , (struct sockaddr *)&peer_addr, &addr_size);
+    
+    assert( res == 0 );
+
+    printf("Hello World from another thread [%d] \n", gettid() );
+
+    printf("successfully accepted! [%d] [%s] [%d]\n", 
+        socket_fd[0], inet_ntoa( peer_addr.sin_addr ), htons(peer_addr.sin_port) );
+
+    //printf("successfully accepted! [%d] \n", accept_fd );
+
 
     while(1){
+        char buffer[256] = {0};
+        int number = recv( socket_fd[0] , buffer, sizeof(buffer)+1, 0 ) ;
         
+        if(number == -1 | number == 0 )
+        //if(number == -1 )
+            break;
+
+        printf("[%s] [%d]\n", buffer, number);
     }
+
+    printf("End of the thread [%d] \n", gettid() );
+
+    close(socket_fd[0]);
 
 }
 
@@ -88,7 +118,8 @@ int main(){
 
             // treat accept_fd to new thread
             //int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
-            int create_r =  pthread_create( &my_threads[ threads_count ], NULL, (void *)(* treat_client ), (void *)( &peer_addr) );
+            int create_r =  pthread_create( &my_threads[ threads_count ], NULL, 
+                (void *)(* treat_client ), (void *)( &accept_fd ) );
 
             //pthread_create( &thr[i], NULL, (void *)(* num_of_primes), (void *)( &(prime_data[i]) ) );
 
@@ -110,33 +141,16 @@ int main(){
 
 
         
-
-
-        // nbcar=recvfrom(sd, buff,MAXOCTETS+1,0,NULL,NULL);
         
-        int number;
         
-        while(1){
-
-            char buffer[256] = {0};
-            number = recv( accept_fd, buffer, sizeof(buffer)+1, 0 ) ;
-            
-            if(number == -1 | number == '\0' )
-                break;
-
-            printf("[%s] [%d]\n", buffer, number);
-
-        }
 
         //int number = recv( accept_fd, buffer, 255, 0 ) ;
 
-        printf("Here now \n");
-
-        running = 0;
+        
 
     }
 
-    close(socket_fd);
+    printf("This is the end! \n");
 
     return 0;
 }

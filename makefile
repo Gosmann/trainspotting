@@ -1,10 +1,7 @@
 all : 
-	gcc server.c -o server
-	gcc client.c -o client
+	gcc src/main.c src/railway.c -o main
+	gcc src/server.c -o bin/server
+	gcc src/client.c -o bin/client
 
-server : 
-	gcc server.c -o server
 
-client :
-	gcc client.c -o client
 
