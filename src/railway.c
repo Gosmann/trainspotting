@@ -38,7 +38,7 @@ int create_train(train_t * train, int type, char * train_id) {
 // prints the parameters of a train in the screen
 void print_train_params(train_t * train) {   
     
-    printf("🚆 \t [%s%s] | [LOC, EOA]: [%3d, %3d ] \n",
+    printf("🚆 | [%s%s] | [LOC, EOA]: [%3d, %3d ] \n",
         train->type_id, train->id, train->location, train->eoa );
 
 }
@@ -95,9 +95,14 @@ train_set_t * remove_train(train_set_t ** set){
 
     train_set_t * old = set[0] ; 
     
+    if( set[0]->prev != NULL )
+        set[0]->prev->next = set[0]->next ;
+    
+    if( set[0]->next != NULL )
+        set[0]->next->prev = set[0]->prev;
+    
     set[0] = (set[0]->next);
-    set[0]->next->prev = NULL;
-
+    
     free( old ) ;
 
     return set[0];  // returns the new first element
@@ -115,7 +120,7 @@ void print_all_trains( train_set_t * set )
 
     while( set->next != NULL ){
         
-        printf("🚅 \t [%d] | ", num );
+        printf("[] \t [%d] | ", num );
         print_train_params( &(set->train) );
 
         set = set->next ;

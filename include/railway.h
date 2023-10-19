@@ -31,6 +31,13 @@ typedef struct train_set {
     struct train_set * prev;      // pointer to the prev element
 } train_set_t;
 
+// struct of messaging
+typedef struct message_t {
+    char message[256] ;
+    train_t train ;
+} message_t ;
+
+
 // functions on [train_t]
 
 // this function populates a raw train element with a type and an id

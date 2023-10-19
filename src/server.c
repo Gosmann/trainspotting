@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <arpa/inet.h>      // from man htons
 #include <unistd.h>         // from man close
@@ -27,6 +28,14 @@ void * treat_client( train_set_t * train ){
     printf("🛜 \t new connection from [ip:%s] and [port:%d] at [PID:%d] \n",
         inet_ntoa( peer_addr.sin_addr ), htons(peer_addr.sin_port), gettid() );
     
+    // obtain data of the arriving train:
+    train_t train_data ;
+    int recv_r = recv( train->train.socket_fd , &train_data, sizeof(train_t), 0 ) ;
+    
+    // update data
+    strcpy( train->train.type_id, train_data.type_id );
+    strcpy( train->train.id, train_data.id );
+
     // print current train params
     //print_train_params( &(train->train) );
 
@@ -35,18 +44,35 @@ void * treat_client( train_set_t * train ){
         print_all_trains( train );
 
         char buffer[256] = {0};
-        int number = recv( train->train.socket_fd , buffer, sizeof(buffer)+1, 0 ) ;
+        message_t message;
+        int number = recv( train->train.socket_fd , &message, sizeof(message), 0 ) ;
         
         if(number == -1 | number == 0 )
         //if(number == -1 )
             break;
+        
+        if( message.message[0] == 'u' ){    // update position
+            train->train.location = message.train.location;
 
-        printf("[%s] [%d]\n", buffer, number);
+            train->train.eoa = 66 ;
+            message_t message_new = { {"EOA"}, train->train };
+            int send_r = sendto(  train->train.socket_fd, &message_new, 
+                sizeof(message_new), 0, NULL, 0);
+            
+            assert(send_r != -1);
+        }
+
+        
+        
+        //printf("[%s] [%d]\n", buffer, number);
     }
+
+    remove_train( &train );
 
     printf("❌ \t end of connection from [ip:%s] and [port:%6d] at [PID:%d]\n\n",
         inet_ntoa( peer_addr.sin_addr ), htons(peer_addr.sin_port), gettid() );
 
+    print_all_trains( train );
 
     close( train->train.socket_fd );
 }
