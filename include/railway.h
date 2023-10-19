@@ -1,6 +1,11 @@
 // TODO add mmultiple includes protection safeguards
 
-#define NUM_STD_TYPES 3 // Number of train types
+#ifndef RAILWAY_H
+#define RAILWAY_H
+
+#include <pthread.h>              // from man pthreads
+
+#define NUM_STD_TYPES 3           // Number of train types
 
 // standard train types
 typedef enum std_types {
@@ -15,12 +20,15 @@ typedef struct train_t {
     int location;                 // current canton location [ 0 ~ 100 ]
     int eoa;                      // end_of_authority , max location the train is allowed to go
     int socket_fd;                // socket_fd
+    
+    pthread_t thread;             // thread_identifier
 } train_t ;
 
 // struct that defines the train sequence as a linked list
 typedef struct train_set {
     train_t train;                // stores a train element in memory
     struct train_set * next;      // pointer to the next element
+    struct train_set * prev;      // pointer to the prev element
 } train_set_t;
 
 // functions on [train_t]
@@ -37,6 +45,9 @@ void print_train_params(train_t* train);
 // this functions creates a new train_set_t element from scratch
 train_set_t * start_train_set(int type_id, char * train_id);
 
+// creates a new element of train_set_t from previous last element
+train_set_t * create_empty_train_set( train_set_t * last_train ) ;
+
 // adds an element to the set of trains
 train_set_t * add_train(train_set_t * set, int type_id, char * train_id);
 
@@ -46,11 +57,6 @@ train_set_t * remove_train(train_set_t ** set);
 // prints the parameters of all trains in the railway
 void print_all_trains( train_set_t * set );
 
-
-
-
-
-
-
+#endif  
 
 

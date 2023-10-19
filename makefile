@@ -1,7 +1,8 @@
 all : 
-	gcc src/main.c src/railway.c -o main
-	gcc src/server.c -o bin/server
-	gcc src/client.c -o bin/client
+	gcc src/train.c src/railway.c src/server.c -o train
+	gcc src/railway.c src/main.c src/server.c -o main
+	
+
 
 
 

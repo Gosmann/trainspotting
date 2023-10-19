@@ -1,29 +1,54 @@
 // TODO make good header
+// TODO add date and time to main screen like a linux boot
 
 // desc. this file simulates a train control station (Radio Block Center)
 
 #include <stdio.h>
+#include <assert.h>
+
 #include "../include/railway.h"
+#include "../include/server.h"
 
 int main( int argc, char ** argv ){
+    
+    train_set_t * railway = create_empty_train_set( NULL ) ;
 
-    train_set_t * railway = start_train_set( TGV, "123" ) ;
+    int running = 1;
+    
+    // implement command line parsing to obtain :
+    // TODO is there any other thing to obtain from command line interface?
+    int port = 1994;
 
-    print_all_trains( railway );
+    // start server integration
+    int socket_fd = init_tcp_server( port );
 
-    add_train( railway, TER, "666" );
-    add_train( railway, RER, "122" );
-    add_train( railway, TGV, "985" );
+    assert( socket_fd > 0 );    // has successfully created the socket
+    
+    train_set_t * current_train = railway;
 
-    print_all_trains( railway );
+    // starts infinite loop for accepting connections
+    while( running ){
+        
+        // waits until a client connects
+        int accept_fd = wait_for_connection( socket_fd );   
 
-    remove_train( &railway );
+        assert( accept_fd > 0 ) ;   // client has logged in successfully
 
-    print_all_trains( railway );
+        //railway->train.socket_fd = accept_fd;
+        current_train->train.socket_fd = accept_fd;
+        
+        // make a thread to deal with this train
+        int connect_r = connect_to_train( current_train );
 
-    remove_train( &railway );
+        assert( connect_r == 0);    // successfull thread connection
+        
+        current_train = create_empty_train_set( current_train );
+        
+    }
 
-    print_all_trains( railway );
+    printf("This is the end! \n");
+
+
 
     return 0;
 }
