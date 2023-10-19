@@ -44,7 +44,7 @@ train_set_t * add_train(train_set_t * set, int type_id, char * train_id);
 train_set_t * remove_train(train_set_t ** set);
 
 // prints the parameters of all trains in the railway
-void print_all_trains(train_set_t * set, int num);
+void print_all_trains( train_set_t * set );
 
 
 

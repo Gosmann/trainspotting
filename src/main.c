@@ -7,11 +7,23 @@
 
 int main( int argc, char ** argv ){
 
-    printf("Hello World ! \n");
-
     train_set_t * railway = start_train_set( TGV, "123" ) ;
 
-    print_all_trains( railway, 0 );
+    print_all_trains( railway );
+
+    add_train( railway, TER, "666" );
+    add_train( railway, RER, "122" );
+    add_train( railway, TGV, "985" );
+
+    print_all_trains( railway );
+
+    remove_train( &railway );
+
+    print_all_trains( railway );
+
+    remove_train( &railway );
+
+    print_all_trains( railway );
 
     return 0;
 }
